@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Censo de Avistamientos de Especies</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        #chartsContainer {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-gap: 20px;
+        }
+        .chart-container {
+            width: 100%;
+            height: 300px;
+            border: 1px solid #ccc;
+            padding: 10px;
+        }
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Censo de Avistamientos de Especies</h1>
+    <button onclick="generarNuevoCenso()">Generar Nuevo Censo</button>
+    <button onclick="buscarCenso()">Buscar Censo</button>
+    <div id="chartsContainer"></div>
+
+    <script>
+        // Función para generar un Censo de Avistamientos de Especies y mostrarlo en un diagrama de línea
+        function generarCenso() {
+            var nombreCenso = prompt("Ingrese el nombre del censo:");
+            if (!nombreCenso) return; // Si el usuario cancela, no se genera el censo
+
+            var meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            var cantidades = [10, 20, 15, 30, 25, 40, 35, 30, 20, 15, 10, 5]; // Cantidades definidas directamente en el código
+
+            // Guardar el censo en el almacenamiento local del navegador
+            var censosGuardados = JSON.parse(localStorage.getItem('censos')) || {};
+            censosGuardados[nombreCenso] = cantidades;
+            localStorage.setItem('censos', JSON.stringify(censosGuardados));
+
+            // Crear el contenedor del diagrama de línea
+            var container = document.createElement('div');
+            container.classList.add('chart-container');
+            document.getElementById('chartsContainer').appendChild(container);
+
+            // Crear el canvas para el diagrama de línea
+            var canvas = document.createElement('canvas');
+            container.appendChild(canvas);
+
+            // Crear el diagrama de línea
+            var ctx = canvas.getContext('2d');
+            var lineChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: meses,
+                    datasets: [{
+                        label: nombreCenso, // Utilizar el nombre del censo como título del gráfico
+                        data: cantidades,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: 'Censo de Animales'
+                    },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    }
+                }
+            });
+
+            // Crear el botón de eliminación
+            var deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Eliminar Censo';
+            deleteButton.onclick = function() {
+                eliminarCenso(container, nombreCenso);
+            };
+            container.appendChild(deleteButton);
+        }
+
+        // Función para buscar un censo por nombre y mostrarlo en un diagrama de línea
+        function buscarCenso() {
+            var nombreCenso = prompt("Ingrese el nombre del censo a buscar:");
+            if (!nombreCenso) return; // Si el usuario cancela, no se realiza la búsqueda
+
+            var censosGuardados = JSON.parse(localStorage.getItem('censos')) || {};
+            var cantidades = censosGuardados[nombreCenso];
+            if (!cantidades) {
+                alert("El censo '" + nombreCenso + "' no existe.");
+                return;
+            }
+
+            var meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+            // Crear el contenedor del diagrama de línea
+            var container = document.createElement('div');
+            container.classList.add('chart-container');
+            document.getElementById('chartsContainer').appendChild(container);
+
+            // Crear el canvas para el diagrama de línea
+            var canvas = document.createElement('canvas');
+            container.appendChild(canvas);
+
+            // Crear el diagrama de línea
+            var ctx = canvas.getContext('2d');
+            var lineChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: meses,
+                    datasets: [{
+                        label: nombreCenso, // Utilizar el nombre del censo como título del gráfico
+                        data: cantidades,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: 'Censo de Animales'
+                    },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    }
+                }
+            });
+
+            // Crear el botón de eliminación
+            var deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Eliminar Censo';
+            deleteButton.onclick = function() {
+                eliminarCenso(container, nombreCenso);
+            };
+            container.appendChild(deleteButton);
+        }
+
+        // Función para eliminar un censo y su diagrama de línea
+        function eliminarCenso(container, nombreCenso) {
+            // Eliminar el censo del almacenamiento local
+            var censosGuardados = JSON.parse(localStorage.getItem('censos')) || {};
+            delete censosGuardados[nombreCenso];
+            localStorage.setItem('censos', JSON.stringify(censosGuardados));
+
+            // Eliminar el contenedor y su contenido
+            container.parentNode.removeChild(container);
+        }
+
+        // Función para generar un nuevo censo cuando se hace clic en el botón correspondiente
+        function generarNuevoCenso() {
+            generarCenso();
+        }
+    </script>
+</body>
+</html>
